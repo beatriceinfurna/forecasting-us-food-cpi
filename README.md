@@ -30,14 +30,14 @@ The series spans from December 1997 to December 2024 (~26 years) and exhibits cl
 
 ## 🔍 Analysis Steps
 
-1. **Train / Test Split** — ~87% train / ~13% test (36 months, covering 3 full seasonal cycles)
-2. **Exploratory Data Analysis** — Time plot, seasonal plot, seasonal subseries plot, ACF/PACF
-3. **Transformations** — Box-Cox assessment (optimal λ ≈ 0.375 → log transformation applied); intervention dummies for COVID-19 (Apr 2020–Apr 2021) and the 2008 Financial Crisis (Oct 2008–Dec 2009)
-4. **ETS Models** — Three candidates compared: AutoETS, ETS(M,A,M), ETS(M,Ad,M)
-5. **ARIMA Models** — ACF/PACF-guided selection, AutoARIMA, and a dynamic regression model with intervention dummies
-6. **Model Evaluation** — Test set accuracy (RMSE, MAE, MAPE, MASE), residual diagnostics, Ljung-Box test
-7. **Out-of-Sample Forecasts** — 24-month forecast for 2025–2026 using the final model
-8. **Extra: Machine Learning** — Gradient Boosting (GBM) and Neural Network Auto-Regressor (NNAR) comparison
+1. **Train / Test Split** : ~87% train / ~13% test (36 months, covering 3 full seasonal cycles)
+2. **Exploratory Data Analysis** : Time plot, seasonal plot, seasonal subseries plot, ACF/PACF
+3. **Transformations** : Box-Cox assessment (optimal λ ≈ 0.375 → log transformation applied); intervention dummies for COVID-19 (Apr 2020–Apr 2021) and the 2008 Financial Crisis (Oct 2008–Dec 2009)
+4. **ETS Models** : Three candidates compared: AutoETS, ETS(M,A,M), ETS(M,Ad,M)
+5. **ARIMA Models** : ACF/PACF-guided selection, AutoARIMA, and a dynamic regression model with intervention dummies
+6. **Model Evaluation** : Test set accuracy (RMSE, MAE, MAPE, MASE), residual diagnostics, Ljung-Box test
+7. **Out-of-Sample Forecasts** : 24-month forecast for 2025–2026 using the final model
+8. **Extra: Machine Learning** : Gradient Boosting (GBM) and Neural Network Auto-Regressor (NNAR) comparison
 
 ---
 
@@ -52,14 +52,18 @@ The series spans from December 1997 to December 2024 (~26 years) and exhibits cl
 | Gradient Boosting | 19.37 | 8.75% | — | — |
 | NNAR | 60.21 | — | — | — |
 
-> AIC values between ETS and ARIMA are not directly comparable — ETS was fitted on the original scale, ARIMA on log-transformed data.
+> AIC values between ETS and ARIMA are not directly comparable : ETS was fitted on the original scale, ARIMA on log-transformed data.
 
 ### Final Model: ETS(M,A,M)
 Measurement:  y_t = (l_{t-1} + b_{t-1}) * s_{t-m} * (1 + e_t)
+
 Level:        l_t = (l_{t-1} + b_{t-1}) * (1 + alpha * e_t)
+
 Trend:        b_t = b_{t-1} + beta * (l_{t-1} + b_{t-1}) * e_t
+
 Seasonal:     s_t = s_{t-m} * (1 + gamma * e_t)
-Selected because it achieved the lowest test error (RMSE = 4.11, MAPE = 1.71%), passed the Ljung-Box test (p = 0.29 ✅), and its multiplicative structure naturally handles the increasing seasonal amplitude over time — no manual transformation or dummy variables needed.
+
+Selected because it achieved the lowest test error (RMSE = 4.11, MAPE = 1.71%), passed the Ljung-Box test (p = 0.29 ✅), and its multiplicative structure naturally handles the increasing seasonal amplitude over time , no manual transformation or dummy variables needed.
 
 ### Best ARIMA Model: ARIMA(0,1,1)(0,1,1)[12] + Intervention Dummies
 (1-B)(1-B^12) log(y_t) = -0.0793COVID_t - 0.0014Crisis2008_t + (1 - 0.274B)(1 - 0.674B^12) e_t
@@ -107,7 +111,7 @@ Place `CUUR0000SEHB.csv` in the same folder as the notebook before running.
 
 ## 💡 Key Takeaways
 
-- **ETS outperformed ARIMA** — the multiplicative seasonal structure handled increasing variance without needing extra complexity
-- **ML models underperformed significantly** — GBM can't extrapolate beyond training range; ~290 obs is too few for NNAR
-- **Always check residual diagnostics** — the ARIMA model looked accurate on test metrics but failed the Ljung-Box test
+- **ETS outperformed ARIMA** : the multiplicative seasonal structure handled increasing variance without needing extra complexity
+- **ML models underperformed significantly** : GBM can't extrapolate beyond training range; ~290 obs is too few for NNAR
+- **Always check residual diagnostics** : the ARIMA model looked accurate on test metrics but failed the Ljung-Box test
 - **COVID-19 reduced lodging prices by ~7.6%**; the 2008 financial crisis had no statistically significant effect
